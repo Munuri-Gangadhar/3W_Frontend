@@ -1,34 +1,44 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { Form, Button } from 'react-bootstrap';
-import '../css/styles.css'
+import { useNavigate, Link } from 'react-router-dom';
+import '../styles.css';
 
 const AdminLogin = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const navigate = useNavigate();
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
-  const loginHandler = async (e) => {
-    e.preventDefault();
-    const { data } = await axios.post('/api/admin/login', { username, password });
-    localStorage.setItem('token', data.token);
-    navigate('/dashboard');
-  };
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        try {
+            const { data } = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/admin/login`, { username, password });
+            localStorage.setItem('token', data.token);
+            alert('Login Successful');
+            navigate('/admin/dashboard');
+        } catch (error) {
+            alert('Login Failed: ' + error.response?.data?.message || error.message || 'Something went wrong');
+        }
+    };
 
-  return (
-    <Form onSubmit={loginHandler}>
-      <Form.Group controlId="username">
-        <Form.Label>Username</Form.Label>
-        <Form.Control type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-      </Form.Group>
-      <Form.Group controlId="password">
-        <Form.Label>Password</Form.Label>
-        <Form.Control type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      </Form.Group>
-      <Button type="submit">Login</Button>
-    </Form>
-  );
+    return (
+        <form onSubmit={handleLogin}>
+            <h2>Admin Login</h2>
+            <input
+                type="text"
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+            />
+            <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+            />
+            <button type="submit">Login</button>
+            <Link to="/" className="link">Want to upload? Go to the submission form</Link>
+        </form>
+    );
 };
 
 export default AdminLogin;
